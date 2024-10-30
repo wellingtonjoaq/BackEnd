@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Doacao;
 use Illuminate\Http\Request;
 
-class DoacaoController extends Controller
+class MemorialController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $doacoes = Doacao::get();
-
-        return view('doacoes.index', [
-            'doacoes' => $doacoes
-        ]);
+        //
     }
 
     /**

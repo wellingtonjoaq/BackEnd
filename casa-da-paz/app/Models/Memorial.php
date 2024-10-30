@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Doacao extends Model
+class Memorial extends Model
 {
     //
 }
