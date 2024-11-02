@@ -13,4 +13,3 @@ Route::get('/voluntarios/create', [VoluntarioController::class, 'create'])->name
 Route::get('/voluntarios/{id}', [VoluntarioController::class, 'show'])->name('voluntarios.show');
 
 Route::post('/voluntarios', [VoluntarioController::class, 'store'])->name('voluntarios.store');
-
