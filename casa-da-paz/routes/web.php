@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\DoacaoController;
 use App\Http\Controllers\VoluntarioController;
-use App\Models\Doacao;
+use App\Models\Voluntario;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -10,5 +9,8 @@ Route::get('/', function () {
 });
 
 Route::get('/voluntarios', [VoluntarioController::class, 'index'])->name('voluntarios.index');
+Route::get('/voluntarios/create', [VoluntarioController::class, 'create'])->name('voluntarios.create');
+Route::get('/voluntarios/{id}', [VoluntarioController::class, 'show'])->name('voluntarios.show');
 
-Route::get('/doacoes', [DoacaoController::class, 'index'])->name('doacoes.index');
+Route::post('/voluntarios', [VoluntarioController::class, 'store'])->name('voluntarios.store');
+
