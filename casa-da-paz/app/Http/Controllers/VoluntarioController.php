@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 
 class VoluntarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $voluntarios = Voluntario::get();
@@ -19,28 +17,33 @@ class VoluntarioController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        //
+        return view('voluntarios.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        //
+        $dados = $request->except('_token');
+
+        Voluntario::create($dados);
+
+        return redirect('/voluntarios');
     }
+
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $voluntario = Voluntario::find($id);
+
+        return view('voluntarios.show', [
+            'voluntario' => $voluntario
+        ]);
     }
 
     /**
@@ -56,7 +59,14 @@ class VoluntarioController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+                //
+                $voluntario = Voluntario::find($id);
+
+                $dados = $request->only('nome', 'cpf', 'email', 'telefone', 'areas');
+        
+                $voluntario->update($dados);
+        
+                return redirect('/voluntario');
     }
 
     /**
