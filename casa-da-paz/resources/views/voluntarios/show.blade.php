@@ -11,7 +11,7 @@
                 <p><strong>CPF:</strong> {{ $voluntario->cpf }}</p>
                 <p><strong>E-mail:</strong> {{ $voluntario->email }}</p>
                 <p><strong>Telefone:</strong> {{ $voluntario->telefone }}</p>
-                <p><strong> Áreas:</strong> {{ $voluntario->areas }}</p>
+                <p><strong>Áreas:</strong> {{ $voluntario->areas }}</p>
                 <br>
                 <a class="btn btn-success" href="{{ route('voluntarios.index') }}">Voltar</a>
             </div>

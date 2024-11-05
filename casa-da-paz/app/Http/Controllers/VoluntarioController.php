@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Voluntario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VoluntarioController extends Controller
 {
@@ -26,11 +27,18 @@ class VoluntarioController extends Controller
 
     public function store(Request $request)
     {
-        $dados = $request->except('_token');
+        $dados = $request->validate([
+            'nome' => 'required|string|max:255',
+            'cpf' => 'required|string|max:11',
+            'email' => 'required|email',
+            'telefone' => 'nullable|string',
+            'areas' => 'nullable|string',
+        ]);
 
         Voluntario::create($dados);
 
-        return redirect('/voluntarios');
+        return redirect()->route('voluntarios.index')->with('success', 'Voluntário criado com sucesso!');
+
     }
 
 
@@ -51,7 +59,11 @@ class VoluntarioController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $voluntario = Voluntario::find($id);
+
+        return view('voluntarios.edit', [
+            'voluntario' => $voluntario
+        ]);
     }
 
     /**
@@ -62,8 +74,14 @@ class VoluntarioController extends Controller
                 //
                 $voluntario = Voluntario::find($id);
 
-                $dados = $request->only('nome', 'cpf', 'email', 'telefone', 'areas');
-        
+                $dados = $request->validate([
+                    'nome' => 'required|string|max:255',
+                    'cpf' => 'required|string|max:11',
+                    'email' => 'required|email',
+                    'telefone' => 'nullable|string',
+                    'areas' => 'nullable|string',
+                ]);
+                
                 $voluntario->update($dados);
         
                 return redirect('/voluntario');
@@ -74,6 +92,10 @@ class VoluntarioController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $voluntario = Voluntario::find($id);
+
+        $voluntario->delete();
+
+        return redirect('/voluntarios');
     }
 }
