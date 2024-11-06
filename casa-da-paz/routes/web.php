@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\MemorialController;
 use App\Http\Controllers\VoluntarioController;
-use App\Models\Voluntario;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,6 +13,8 @@ Route::get('/voluntarios/create', [VoluntarioController::class, 'create'])->name
 Route::get('/voluntarios/{id}', [VoluntarioController::class, 'show'])->name('voluntarios.show');
 Route::get('/voluntarios/{id}/edit', [VoluntarioController::class, 'edit'])->name('voluntarios.edit');
 Route::post('/voluntarios', [VoluntarioController::class, 'store'])->name('voluntarios.store');
+Route::put('/voluntarios/{id}', [VoluntarioController::class, 'update'])->name('voluntarios.update');
+Route::delete('/voluntarios/{id}', [VoluntarioController::class, 'destroy'])->name('voluntarios.destroy');
 
 Route::get('/memorial', [MemorialController::class, 'index'])->name('memorial.index');
 Route::get('/memorial/create', [MemorialController::class, 'create'])->name('memorial.create');

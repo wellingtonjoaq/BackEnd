@@ -84,7 +84,7 @@ class VoluntarioController extends Controller
                 
                 $voluntario->update($dados);
         
-                return redirect('/voluntario');
+                return redirect('/voluntarios');
     }
 
     /**
