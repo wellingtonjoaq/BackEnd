@@ -3,7 +3,7 @@
 @section('content')
     <h1>Formulario</h1>
 
-    <form action="{{ route('memorial.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('galeria.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
         <div class="mb-3">
             <label for="nome" class="form-label">Nome</label>
@@ -16,8 +16,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="informacao" class="form-label">Informação</label>
-            <input type="text" class="form-control" id="informacao" name="informacao" placeholder="Informação da imagem">
+            <label for="data" class="form-label">Data</label>
+            <input type="date" class="form-control" id="data" name="data">
         </div>
 
         <button class="btn btn-success" type="submit">Enviar</button>
