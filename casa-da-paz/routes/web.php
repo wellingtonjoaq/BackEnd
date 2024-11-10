@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\MemorialController;
 use App\Http\Controllers\VoluntarioController;
+use App\Models\Galeria;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,3 +25,11 @@ Route::get('/memorial/{id}/edit', [MemorialController::class, 'edit'])->name('me
 Route::post('/memorial',[MemorialController::class, 'store'])->name('memorial.store');
 Route::put('/memorial/{id}', [MemorialController::class, 'update'])->name('memorial.update');
 Route::delete('/memorial/{id}', [MemorialController::class, 'destroy'])->name('memorial.destroy');
+
+Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index');
+Route::get('/galeria/create', [GaleriaController::class, 'create'])->name('galeria.create');
+Route::get('/galeria/{id}', [GaleriaController::class, 'show'])->name('galeria.show');
+Route::get('/galeria/{id}/edit', [GaleriaController::class, 'edit'])->name('galeria.edit');
+Route::post('/galeria', [GaleriaController::class, 'store'])->name('galeria.store');
+Route::put('/galeria/{id}', [GaleriaController::class, 'update'])->name('galeria.update');
+Route::delete('/galeria/{id}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
