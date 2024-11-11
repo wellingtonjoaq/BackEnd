@@ -12,10 +12,7 @@ class VoluntarioController extends Controller
     public function index()
     {
         $voluntarios = Voluntario::get();
-
-        return view('voluntarios.index', [
-            'voluntarios' => $voluntarios
-        ]);
+        return $voluntarios;
     }
 
 
@@ -49,9 +46,7 @@ class VoluntarioController extends Controller
     {
         $voluntario = Voluntario::find($id);
 
-        return view('voluntarios.show', [
-            'voluntario' => $voluntario
-        ]);
+        return  $voluntario;
     }
 
     /**
@@ -61,9 +56,7 @@ class VoluntarioController extends Controller
     {
         $voluntario = Voluntario::find($id);
 
-        return view('voluntarios.edit', [
-            'voluntario' => $voluntario
-        ]);
+        return $voluntario;
     }
 
     /**
@@ -81,9 +74,9 @@ class VoluntarioController extends Controller
                     'telefone' => 'nullable|string',
                     'areas' => 'nullable|string',
                 ]);
-                
+
                 $voluntario->update($dados);
-        
+
                 return redirect('/voluntarios');
     }
 
