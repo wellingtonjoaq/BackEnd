@@ -12,10 +12,7 @@ class VoluntarioController extends Controller
     public function index()
     {
         $voluntarios = Voluntario::get();
-
-        return view('voluntarios.index', [
-            'voluntarios' => $voluntarios
-        ]);
+        return $voluntarios;
     }
 
 
@@ -34,12 +31,33 @@ class VoluntarioController extends Controller
             'telefone' => 'nullable|string',
             'areas' => 'nullable|string',
         ]);
-
+    
+        $cpf = preg_replace('/\D/', '', $dados['cpf']);
+    
+        if (strlen($cpf) != 11 || preg_match("/^{$cpf[0]}{11}$/", $cpf)) {
+            return redirect()->back()->withErrors(['cpf' => 'CPF inválido.']);
+        }
+    
+        for ($s = 10, $n = 0, $i = 0; $s >= 2; $n += $cpf[$i++] * $s--);
+        if ($cpf[9] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
+            return redirect()->back()->withErrors(['cpf' => 'CPF inválido.']);
+        }
+    
+        for ($s = 11, $n = 0, $i = 0; $s >= 2; $n += $cpf[$i++] * $s--);
+        if ($cpf[10] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
+            return redirect()->back()->withErrors(['cpf' => 'CPF inválido.']);
+        }
+    
+        if (!empty($dados['telefone']) && !preg_match('/^\(\d{2}\)\s?\d{4,5}-\d{4}$/', $dados['telefone'])) {
+            return redirect()->back()->withErrors(['telefone' => 'Telefone inválido. Use o formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX.']);
+        }
+    
         Voluntario::create($dados);
-
+    
         return redirect()->route('voluntarios.index')->with('success', 'Voluntário criado com sucesso!');
-
     }
+    
+    
 
 
     /**
@@ -49,9 +67,7 @@ class VoluntarioController extends Controller
     {
         $voluntario = Voluntario::find($id);
 
-        return view('voluntarios.show', [
-            'voluntario' => $voluntario
-        ]);
+        return  $voluntario;
     }
 
     /**
@@ -61,9 +77,7 @@ class VoluntarioController extends Controller
     {
         $voluntario = Voluntario::find($id);
 
-        return view('voluntarios.edit', [
-            'voluntario' => $voluntario
-        ]);
+        return $voluntario;
     }
 
     /**
@@ -81,9 +95,9 @@ class VoluntarioController extends Controller
                     'telefone' => 'nullable|string',
                     'areas' => 'nullable|string',
                 ]);
-                
+
                 $voluntario->update($dados);
-        
+
                 return redirect('/voluntarios');
     }
 
