@@ -15,9 +15,7 @@ class GaleriaController extends Controller
     {
         $galerias = Galeria::get();
 
-        return view('galeria.index', [
-            'galerias' => $galerias
-        ]);
+        return $galerias;
     }
 
     /**
@@ -25,7 +23,7 @@ class GaleriaController extends Controller
      */
     public function create()
     {
-        return view('galeria.create');
+        return view('galerias.create');
     }
 
     /**
@@ -36,13 +34,12 @@ class GaleriaController extends Controller
         $dados = $request->except('_token');
 
         if($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            $imagemPath = $request->file('imagem')->store('imagens', 'public');
+            $imagemPath = $request->file('imagem')->store('imagem', 'public');
             $dados['imagem'] = $imagemPath;
         }
 
         Galeria::create($dados);
 
-        return redirect('/galeria');
     }
 
     /**
@@ -52,9 +49,7 @@ class GaleriaController extends Controller
     {
         $galeria = Galeria::find($id);
 
-        return view('galeria.show', [
-            'galeria' => $galeria
-        ]);
+        return $galeria;
     }
 
     /**
@@ -64,9 +59,7 @@ class GaleriaController extends Controller
     {
         $galeria = Galeria::find($id);
 
-        return view('galeria.edit', [
-            'galeria' => $galeria
-        ]);
+        return $galeria;
     }
 
     /**
