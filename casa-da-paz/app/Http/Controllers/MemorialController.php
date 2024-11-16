@@ -4,107 +4,80 @@ namespace App\Http\Controllers;
 
 use App\Models\Memorial;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class MemorialController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Listar itens por tipo
+    public function index(Request $request)
     {
-        $memorials = Memorial::get();
+        $tipo = $request->query('tipo');
 
-        return view('memorial.index', [
-            'memorials' => $memorials
-        ]);
+        if (!$tipo) {
+            return response()->json(['message' => 'O tipo é obrigatório!'], 400);
+        }
+
+        $items = Memorial::where('tipo', $tipo)->get();
+        
+        $memorial = Memorial::get();
+        return $memorial;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Obter um item específico
+    public function show($id)
     {
-        return view('memorial.create');
+        $item = Memorial::find($id);
+
+        if (!$item) {
+            return response()->json(['message' => 'Item não encontrado.'], 404);
+        }
+
+        return response()->json($item);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Criar um novo item
     public function store(Request $request)
     {
-        $dados = $request->except('_token');
-
-        if($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            $imagemPath = $request->file('imagem')->store('imagens', 'public');
-            $dados['imagem'] = $imagemPath;
-        }
-
-        Memorial::create($dados);
-
-        return redirect('/memorial');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $memorial = Memorial::find($id);
-
-        return view('memorial.show', [
-            'memorial' => $memorial
+        $data = $request->validate([
+            'nome' => 'required|string|max:255',
+            'informacao' => 'required|string',
+            'imagem' => 'required|string',
+            'tipo' => 'required|in:presidente,secretaria,tesoureiro,conselheiroFiscal,suplente',
         ]);
+
+        $item = Memorial::create($data);
+        return response()->json($item, 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    // Atualizar um item existente
+    public function update(Request $request, $id)
     {
-        $memorial = Memorial::find($id);
+        $item = Memorial::find($id);
 
-        return view('memorial.edit', [
-            'memorial' => $memorial
+        if (!$item) {
+            return response()->json(['message' => 'Item não encontrado.'], 404);
+        }
+
+        $data = $request->validate([
+            'nome' => 'required|string|max:255',
+            'informacao' => 'required|string',
+            'imagem' => 'required|string',
+            'tipo' => 'required|in:presidente,secretaria,tesoureiro,conselheiroFiscal,suplente',
         ]);
+
+        $item->update($data);
+        return response()->json($item);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Excluir um item
+    public function destroy($id)
     {
-        $memorial = Memorial::find($id);
+        $item = Memorial::find($id);
 
-        $dados = $request->only('nome', 'imagem', 'informacao');
-
-        if($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            if($memorial->imagemPath) {
-                Storage::disk('public')->delete($memorial->createimagem);
-            }
-
-            $imagemPath = $request->file('imagem')->store('imagens', 'public');
-            $dados['imagem'] = $imagemPath;
+        if (!$item) {
+            return response()->json(['message' => 'Item não encontrado.'], 404);
         }
 
-        $memorial->update($dados);
-
-        return redirect('/memorial');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $memorial = Memorial::find($id);
-
-        if($memorial->imagem) {
-            Storage::disk('public')->delete($memorial->imagem);
-        }
-
-        $memorial->delete();
-
-        return redirect('/memorial');
+        $item->delete();
+        return response()->noContent();
     }
 }

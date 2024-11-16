@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('memorials', function (Blueprint $table) {
+        Schema::create('memorial', function (Blueprint $table) {
             $table->id();
-            $table->string('nome', 100);
-            $table->string('imagem')->nullable();
-            $table->string('informacao', 100);
+            $table->string('nome');
+            $table->text('informacao');
+            $table->string('imagem');
+            $table->enum('tipo', ['presidente', 'secretaria', 'tesoureiro', 'conselheiroFiscal', 'suplente']);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('memorials');
+        Schema::dropIfExists('memorial');
     }
 };
