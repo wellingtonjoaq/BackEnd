@@ -1,15 +1,23 @@
 <?php
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\MemorialController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoluntarioController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
+Route::post('login', [LoginController::class, 'login']);
+Route::post('logout', [LoginController::class, 'logout']);
+
+Route::post('register', [RegisterController::class, 'create']);
+
+Route::prefix('user')->group(function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::put('{id}', [UserController::class, 'update']);
+    Route::delete('{id}', [UserController::class, 'destroy']);
+});
 
 Route::prefix('voluntarios')->group(function () {
     Route::get('/', [VoluntarioController::class, 'index'])->name('voluntarios.index');

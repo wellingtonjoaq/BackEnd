@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Voluntario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class VoluntarioController extends Controller
 {
@@ -12,7 +11,7 @@ class VoluntarioController extends Controller
     public function index()
     {
         $voluntarios = Voluntario::get();
-        return $voluntarios;
+        return response()->json($voluntarios);
     }
 
 
@@ -24,47 +23,25 @@ class VoluntarioController extends Controller
 
     public function store(Request $request)
     {
-    $dados = $request->validate([
-        'nome' => 'required|string|max:255',
-        'cpf' => 'required|string|max:14', 
-        'email' => 'required|email',
-        'telefone' => 'nullable|string',
-        'areas' => 'nullable|string',
-    ]);
+        $dados = $request->validate([
+            'nome' => 'required|string|max:255',
+            'cpf' => 'required|string|max:11',
+            'email' => 'required|email',
+            'telefone' => 'nullable|string',
+            'areas' => 'nullable|string',
+        ]);
 
-    $cpf = preg_replace('/\D/', '', $dados['cpf']);
+        $voluntarios = Voluntario::create($dados);
 
-    if (strlen($cpf) != 11 || preg_match("/^{$cpf[0]}{11}$/", $cpf)) {
-        return response()->json(['error' => 'CPF inválido.'], 422);
-    }
-
-    for ($s = 10, $n = 0, $i = 0; $s >= 2; $n += $cpf[$i++] * $s--);
-    if ($cpf[9] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
-        return response()->json(['error' => 'CPF inválido.'], 422);
-    }
-
-    for ($s = 11, $n = 0, $i = 0; $s >= 2; $n += $cpf[$i++] * $s--);
-    if ($cpf[10] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
-        return response()->json(['error' => 'CPF inválido.'], 422);
+        return response()->json($voluntarios);
     }
 
 
 
-    $dados['cpf'] = $cpf;
 
-    try {
-        $voluntario = Voluntario::create($dados);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Erro ao salvar o voluntário. Por favor, tente novamente.'], 500);
-    }
-
-    return response()->json([
-        'message' => 'Voluntário criado com sucesso!',
-        'voluntario' => $voluntario
-    ], 201);
-    }
-
-
+    /**
+     * Display the specified resource.
+     */
     public function show(string $id)
     {
         $voluntario = Voluntario::find($id);
@@ -96,7 +73,7 @@ class VoluntarioController extends Controller
 
                 $voluntario->update($dados);
 
-                return redirect('/voluntarios');
+                return response()->json($voluntario);
     }
 
     public function destroy(string $id)
@@ -105,6 +82,7 @@ class VoluntarioController extends Controller
 
         $voluntario->delete();
 
-        return redirect('/voluntarios');
+        return response()->json($voluntario);
+
     }
 }
