@@ -9,5 +9,7 @@ class Memorial extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'imagem', 'informacao'];
+    protected $table = 'memorial';
+
+    protected $fillable = ['nome', 'imagem', 'informacao', 'tipo'];
 }
