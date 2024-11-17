@@ -3,7 +3,7 @@
 use Illuminate\Support\Str;
 
 return [
-
+    'domain' => '.domain.com',
     /*
     |--------------------------------------------------------------------------
     | Default Session Driver
