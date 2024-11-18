@@ -11,7 +11,7 @@ class VoluntarioController extends Controller
     public function index()
     {
         $voluntarios = Voluntario::get();
-        return response()->json($voluntarios);
+        return $voluntarios;
     }
 
 
@@ -23,25 +23,47 @@ class VoluntarioController extends Controller
 
     public function store(Request $request)
     {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:255',
-            'cpf' => 'required|string|max:11',
-            'email' => 'required|email',
-            'telefone' => 'nullable|string',
-            'areas' => 'nullable|string',
-        ]);
+    $dados = $request->validate([
+        'nome' => 'required|string|max:255',
+        'cpf' => 'required|string|max:14',
+        'email' => 'required|email',
+        'telefone' => 'nullable|string',
+        'areas' => 'nullable|string',
+    ]);
 
-        $voluntarios = Voluntario::create($dados);
+    $cpf = preg_replace('/\D/', '', $dados['cpf']);
 
-        return response()->json($voluntarios);
+    if (strlen($cpf) != 11 || preg_match("/^{$cpf[0]}{11}$/", $cpf)) {
+        return response()->json(['error' => 'CPF inválido.'], 422);
+    }
+
+    for ($s = 10, $n = 0, $i = 0; $s >= 2; $n += $cpf[$i++] * $s--);
+    if ($cpf[9] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
+        return response()->json(['error' => 'CPF inválido.'], 422);
+    }
+
+    for ($s = 11, $n = 0, $i = 0; $s >= 2; $n += $cpf[$i++] * $s--);
+    if ($cpf[10] != ((($n %= 11) < 2) ? 0 : 11 - $n)) {
+        return response()->json(['error' => 'CPF inválido.'], 422);
     }
 
 
 
+    $dados['cpf'] = $cpf;
 
-    /**
-     * Display the specified resource.
-     */
+    try {
+        $voluntario = Voluntario::create($dados);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Erro ao salvar o voluntário. Por favor, tente novamente.'], 500);
+    }
+
+    return response()->json([
+        'message' => 'Voluntário criado com sucesso!',
+        'voluntario' => $voluntario
+    ], 201);
+    }
+
+
     public function show(string $id)
     {
         $voluntario = Voluntario::find($id);
@@ -65,7 +87,7 @@ class VoluntarioController extends Controller
 
                 $dados = $request->validate([
                     'nome' => 'required|string|max:255',
-                    'cpf' => 'required|string|max:11',
+                    'cpf' => 'required|string|max:14',
                     'email' => 'required|email',
                     'telefone' => 'nullable|string',
                     'areas' => 'nullable|string',
@@ -83,6 +105,5 @@ class VoluntarioController extends Controller
         $voluntario->delete();
 
         return response()->json($voluntario);
-
     }
 }
