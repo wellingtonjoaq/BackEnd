@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Memorial;
-use App\Models\Voluntario;
 use Illuminate\Http\Request;
 
 class MemorialController extends Controller
@@ -13,7 +12,7 @@ class MemorialController extends Controller
         $tipo = $request->query('tipo');
 
         if (!$tipo) {
-            return response()->json(['message' => 'O tipo é obrigatório!'], 400);
+            return response()->json(['message' => 'O tipo é obrigatório!']);
         }
 
         $items = Memorial::where('tipo', $tipo)->get();
@@ -22,54 +21,20 @@ class MemorialController extends Controller
         return $memorial;
     }
 
-    public function create()
-    {
-        return view('voluntarios.create');
-    }
-
-    public function store(Request $request)
-    {
-        $dados = $request->except('_token');
-
-        if($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            $imagemPath = $request->file('imagem')->store('imagens', 'public');
-            $dados['imagem'] = $imagemPath;
-        }
-
-        Memorial::create($dados);
-
-        return redirect('/memorial');
-    }
-
+    // Obter um item específico
     public function show($id)
     {
         $item = Memorial::find($id);
 
         if (!$item) {
-            return response()->json(['message' => 'Item não encontrado.'], 404);
+            return response()->json(['message' => 'Item não encontrado.']);
         }
 
         return response()->json($item);
     }
 
-
-
-    public function edit(string $id)
+    public function store(Request $request)
     {
-        $voluntario = Voluntario::find($id);
-
-        return $voluntario;
-    }
-
-
-    public function update(Request $request, $id)
-    {
-        $item = Memorial::find($id);
-
-        if (!$item) {
-            return response()->json(['message' => 'Item não encontrado.'], 404);
-        }
-
         $data = $request->validate([
             'nome' => 'required|string|max:255',
             'informacao' => 'required|string',
@@ -77,7 +42,32 @@ class MemorialController extends Controller
             'tipo' => 'required|in:presidente,secretaria,tesoureiro,conselheiroFiscal,suplente',
         ]);
 
+        $item = Memorial::create($data);
+        return response()->json($item);
+    }
+
+    // Atualizar um item existente
+    public function update(Request $request, $id)
+    {
+        $item = Memorial::find($id);
+
+        if (!$item) {
+            return response()->json(['message' => 'Item não encontrado.']);
+        }
+
+        $data = $request->validate([
+            'nome' => 'required|string|max:255',
+            'informacao' => 'required|string',
+            'tipo' => 'required|in:presidente,secretaria,tesoureiro,conselheiroFiscal,suplente',
+        ]);
+
+        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+            $imagemPath = $request->file('imagem')->store('imagens', 'public');
+            $data['imagem'] = $imagemPath;
+        }
+
         $item->update($data);
+
         return response()->json($item);
     }
 
@@ -86,10 +76,11 @@ class MemorialController extends Controller
         $item = Memorial::find($id);
 
         if (!$item) {
-            return response()->json(['message' => 'Item não encontrado.'], 404);
+            return response()->json(['message' => 'Item não encontrado.']);
         }
 
         $item->delete();
+
         return response()->noContent();
     }
 }

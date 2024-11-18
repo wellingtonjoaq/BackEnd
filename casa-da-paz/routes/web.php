@@ -3,7 +3,6 @@
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\MemorialController;
 use App\Http\Controllers\VoluntarioController;
-use App\Models\Galeria;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
