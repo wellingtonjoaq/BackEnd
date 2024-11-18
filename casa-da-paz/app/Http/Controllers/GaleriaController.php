@@ -8,96 +8,103 @@ use Illuminate\Support\Facades\Storage;
 
 class GaleriaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        $galerias = Galeria::get();
+        $galerias = Galeria::all()->map(function ($galeria) {
+            $galeria->imagens_extras = json_decode($galeria->imagens_extras, true) ?? [];
+            return $galeria;
+        });
 
-        return $galerias;
+        return response()->json($galerias);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('galerias.create');
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $dados = $request->except('_token');
 
-        if($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
             $imagemPath = $request->file('imagem')->store('imagem', 'public');
             $dados['imagem'] = $imagemPath;
         }
 
-        Galeria::create($dados);
+        $galeria = Galeria::create($dados);
 
+        return response()->json($galeria);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         $galeria = Galeria::find($id);
 
-        return $galeria;
+        if ($galeria) {
+            $galeria->imagens_extras = json_decode($galeria->imagens_extras, true) ?? [];
+        }
+
+        return response()->json($galeria);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $galeria = Galeria::find($id);
 
-        return $galeria;
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $galeria = Galeria::find($id);
 
-        $dados = $request->only('nome', 'imagem', 'data');
+        if (!$galeria) {
+            return response()->json(['message' => 'Galeria não encontrada'], 404);
+        }
 
-        if($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-            if($galeria->imagemPath) {
-                Storage::disk('public')->delete($galeria->createimagem);
+        $dados = $request->only('nome', 'data');
+
+        if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+            if ($galeria->imagem) {
+                Storage::disk('public')->delete($galeria->imagem);
             }
 
             $imagemPath = $request->file('imagem')->store('imagens', 'public');
             $dados['imagem'] = $imagemPath;
         }
 
+        $imagensExtras = json_decode($galeria->imagens_extras ?? '[]', true);
+        for ($i = 1; $i <= 3; $i++) {
+            $campoImagem = "imagemExtra{$i}";
+            if ($request->hasFile($campoImagem) && $request->file($campoImagem)->isValid()) {
+                if (isset($imagensExtras[$i - 1])) {
+                    Storage::disk('public')->delete($imagensExtras[$i - 1]);
+                }
+                $imagensExtras[$i - 1] = $request->file($campoImagem)->store('imagens', 'public');
+            }
+        }
+
+        $dados['imagens_extras'] = json_encode($imagensExtras);
+
         $galeria->update($dados);
 
-        return redirect('/galeria');
+        return response()->json($galeria, 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         $galeria = Galeria::find($id);
 
-        if($galeria->imagem) {
+        if (!$galeria) {
+            return response()->json(['message' => 'Galeria não encontrada'], 404);
+        }
+
+        if ($galeria->imagem) {
             Storage::disk('public')->delete($galeria->imagem);
+        }
+
+        $imagensExtras = json_decode($galeria->imagens_extras ?? '[]', true);
+        foreach ($imagensExtras as $imagemExtra) {
+            Storage::disk('public')->delete($imagemExtra);
         }
 
         $galeria->delete();
 
-        return redirect('/galeria');
+        return response()->json(['message' => 'Galeria excluída com sucesso'], 200);
     }
 }

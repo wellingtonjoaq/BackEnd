@@ -9,5 +9,9 @@ class Galeria extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'imagem', 'data'];
+    protected $fillable = ['nome', 'imagem', 'data', 'imagens_extras'];
+
+    protected $casts = [
+        'imagens_extras' => 'array',
+    ];
 }
